@@ -1,72 +1,46 @@
 from bottle import route, run, request, abort, static_file
-from fsm import TocMachine
+from ordering_machine import OrderingMachine
+import os
 
-VERIFY_TOKEN = "TOC20181219"
-machine = TocMachine(
-    states=[
-        'user',
-        'state1',
-        'state2'
-    ],
-    transitions=[
-        {
-            'trigger': 'advance',
-            'source': 'user',
-            'dest': 'state1',
-            'conditions': 'is_going_to_state1'
-        },
-        {
-            'trigger': 'advance',
-            'source': 'user',
-            'dest': 'state2',
-            'conditions': 'is_going_to_state2'
-        },
-        {
-            'trigger': 'go_back',
-            'source': [
-                'state1',
-                'state2'
-            ],
-            'dest': 'user'
-        }
-    ],
-    initial='user',
-    auto_transitions=False,
-    show_conditions=True,
-)
+VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN")
+machine = {}
 
-
-@route("/webhook", method="GET")
+@route("/webhook", method = "GET")
 def setup_webhook():
+    """
+        Setting up webhook.
+    """
     mode = request.GET.get("hub.mode")
     token = request.GET.get("hub.verify_token")
     challenge = request.GET.get("hub.challenge")
-
     if mode == "subscribe" and token == VERIFY_TOKEN:
         print("WEBHOOK_VERIFIED")
         return challenge
     else:
         abort(403)
 
-
-@route("/webhook", method="POST")
+@route("/webhook", method = "POST")
 def webhook_handler():
+    """
+        Handling message from user.
+        Use event['sender']['id'] to identify session
+    """
     body = request.json
-    print('\nFSM STATE: ' + machine.state)
-    print('REQUEST BODY: ')
     print(body)
 
     if body['object'] == "page":
         event = body['entry'][0]['messaging'][0]
-        machine.advance(event)
+        session_id = event['sender']['id']
+        if not session_id in machine:
+            machine[session_id] = OrderingMachine(session_id)
+        else:
+            machine[session_id].transit(event)
         return 'OK'
 
-
-@route('/show-fsm', methods=['GET'])
+@route('/show-fsm', methods = ['GET'])
 def show_fsm():
-    machine.get_graph().draw('fsm.png', prog='dot', format='png')
+    #machine['<PSID>'].get_graph().draw('fsm.png', prog='dot', format='png')
     return static_file('fsm.png', root='./', mimetype='image/png')
-
 
 if __name__ == "__main__":
     run(host="localhost", port=5000, debug=True, reloader=True)
