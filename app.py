@@ -1,9 +1,7 @@
 from bottle import route, run, request, abort, static_file
-
 from fsm import TocMachine
 
-
-VERIFY_TOKEN = "Your Webhook Verify Token"
+VERIFY_TOKEN = "TOC20181219"
 machine = TocMachine(
     states=[
         'user',
@@ -47,7 +45,6 @@ def setup_webhook():
     if mode == "subscribe" and token == VERIFY_TOKEN:
         print("WEBHOOK_VERIFIED")
         return challenge
-
     else:
         abort(403)
 
