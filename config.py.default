@@ -1,0 +1,9 @@
+# Facebook API configuration
+VERIFY_TOKEN =
+ACCESS_TOKEN =
+
+# Database configuration
+DATABASE_USER =
+DATABASE_PASSWORD =
+DATABASE_HOST =
+DATABASE_PORT =

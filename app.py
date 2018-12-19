@@ -1,8 +1,7 @@
 from bottle import route, run, request, abort, static_file
 from ordering_machine import OrderingMachine
-import os
+from config import VERIFY_TOKEN
 
-VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN")
 machine = {}
 
 @route("/webhook", method = "GET")
@@ -39,7 +38,7 @@ def webhook_handler():
 
 @route('/show-fsm', methods = ['GET'])
 def show_fsm():
-    #machine['<PSID>'].get_graph().draw('fsm.png', prog='dot', format='png')
+    machine['2436016659761117'].get_graph().draw('fsm.png', prog='dot', format='png')
     return static_file('fsm.png', root='./', mimetype='image/png')
 
 if __name__ == "__main__":
