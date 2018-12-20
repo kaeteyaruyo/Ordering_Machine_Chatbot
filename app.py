@@ -25,8 +25,6 @@ def webhook_handler():
         Use event['sender']['id'] to identify session
     """
     body = request.json
-    print(body)
-
     if body['object'] == "page":
         event = body['entry'][0]['messaging'][0]
         session_id = event['sender']['id']
@@ -38,8 +36,7 @@ def webhook_handler():
 
 @route('/show-fsm', methods = ['GET'])
 def show_fsm():
-    machine['2436016659761117'].get_graph().draw('fsm.png', prog='dot', format='png')
-    return static_file('fsm.png', root='./', mimetype='image/png')
+    return static_file('fsm.png', root = './', mimetype = 'image/png')
 
 if __name__ == "__main__":
-    run(host="localhost", port=5000, debug=True, reloader=True)
+    run(host = "localhost", port = 5000, debug = True, reloader = True)

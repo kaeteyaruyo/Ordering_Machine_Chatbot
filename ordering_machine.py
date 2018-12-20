@@ -332,6 +332,7 @@ class OrderingMachine(GraphMachine):
         send_text(self.id, '請輸入您的姓名、聯絡電話與地址')
 
     def on_enter_order_finish(self, event):
+        print(self.order_list)
         update_sale_count(self.order_list)
         send_text(self.id, '已收到您的訂單，感謝您的惠顧！')
         send_text(self.id, '如須其它服務，請傳送任意訊息~')
